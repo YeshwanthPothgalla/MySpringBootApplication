@@ -2,6 +2,7 @@ package com.CaluculatorTest.controller;
 
 import com.CaluculatorTest.model.Student;
 import com.CaluculatorTest.model.StudentMarks;
+import com.CaluculatorTest.repository.StudentMarksRepository;
 import com.CaluculatorTest.repository.StudentRepository;
 import com.CaluculatorTest.service.CaluculatorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,34 +22,39 @@ public class StudentController {
     private StudentRepository studentRepository;
     @Autowired
     private CaluculatorService caluculatorService;
+    @Autowired
+    private StudentMarksRepository studentMarksRepository;
 
     @PutMapping("/student")
     public ResponseEntity<Integer> saveStudent(@RequestBody Student student) {
         Student save = studentRepository.save(student);
         return new ResponseEntity<>(save.getId(), HttpStatus.CREATED);
     }
-//
-//
-//    @GetMapping("/student")
-//    public ResponseEntity<Student> getStudent(@RequestParam Integer id) {
-//        Optional<Student> byId = studentRepository.findById(id);
-//        if (byId.isPresent()) {
-//            return new ResponseEntity<>(byId.get(), HttpStatus.FOUND);
-//        }
-//        return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
-//    }
-//
+
+
+    @GetMapping("/student")
+    public ResponseEntity<Student> getStudent(@RequestParam Integer id) {
+        Optional<Student> byId = studentRepository.findById(id);
+        if (byId.isPresent()) {
+            return new ResponseEntity<>(byId.get(), HttpStatus.FOUND);
+        }
+        return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+    }
+
 //
 //    @GetMapping("/subject")
 //    public ResponseEntity<List<Student>> getStudentBySubject(@RequestParam String subject) {
 //        List<Student> students = studentRepository.findBySubject(subject);
 //        return new ResponseEntity<>(students, HttpStatus.OK);
 //    }
-//    @GetMapping("/total")
-//    public int getTotal(@RequestParam String name) {
-//        List<Student> students = studentRepository.findByName(name);
-//            return caluculatorService.getStudentTotalMarks(studentMarks);
-//    }
+    @GetMapping("/totalmarks")
+    public int getTotal(@RequestParam Integer id ) {
+       Optional<List<StudentMarks>> marks = studentMarksRepository.getMarksOfStudent(id);
+       if(marks.isPresent())
+            return caluculatorService.getStudentTotalMarks(marks.get());
+       else
+           return 0;
+    }
 
     @GetMapping("/total")
     public ResponseEntity<Integer> getTotalMarks(@RequestParam Integer id) {
